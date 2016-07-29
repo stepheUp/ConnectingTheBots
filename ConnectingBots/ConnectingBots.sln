@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.25420.1
+VisualStudioVersion = 14.0.25123.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{A07B5EB6-E848-4116-A8D0-A826331D98C6}") = "BackendServices", "BackendServices\BackendServices.sfproj", "{685BB03F-628A-4103-B2FA-31A62B288656}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssistStatefulService", "AssistStatefulService\AssistStatefulService.csproj", "{985739BD-DDEA-4D57-AE09-A46EF7B37B43}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{5A14700C-FBB2-41B3-86A2-55DBA853BF12}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,14 +29,6 @@ Global
 		{985739BD-DDEA-4D57-AE09-A46EF7B37B43}.Release|Any CPU.ActiveCfg = Release|x64
 		{985739BD-DDEA-4D57-AE09-A46EF7B37B43}.Release|x64.ActiveCfg = Release|x64
 		{985739BD-DDEA-4D57-AE09-A46EF7B37B43}.Release|x64.Build.0 = Release|x64
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Debug|x64.Build.0 = Debug|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Release|x64.ActiveCfg = Release|Any CPU
-		{5A14700C-FBB2-41B3-86A2-55DBA853BF12}.Release|x64.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
