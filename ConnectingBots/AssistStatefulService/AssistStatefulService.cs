@@ -10,6 +10,7 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using System.ServiceModel;
 using System.Diagnostics;
 
+
 namespace AssistStatefulService
 {
     /// <summary>
