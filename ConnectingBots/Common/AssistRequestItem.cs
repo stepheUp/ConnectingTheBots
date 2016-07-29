@@ -9,7 +9,7 @@ namespace Common
     public struct AssistRequestItem
     {
         public int IdAssistItem { get; set; }
-        public string LastMessage { get; set; }
+        public List<string> Messages { get; set; }
 
     }
 }

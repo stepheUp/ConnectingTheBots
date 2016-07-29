@@ -9,14 +9,17 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.ServiceModel;
 using System.Diagnostics;
-
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
+using Common;
+using System.ServiceModel.Channels;
+using System.Web.Services.Description;
 
 namespace AssistStatefulService
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class AssistStatefulService : StatefulService
+    internal sealed class AssistStatefulService : StatefulService, IAssistRequestService
     {
         public AssistStatefulService(StatefulServiceContext context)
             : base(context)
@@ -34,12 +37,14 @@ namespace AssistStatefulService
             return new[]
             {
                 new ServiceReplicaListener(context =>
-                        new WcfCommunicationListener(context,typeof(IAssistRequestService,this)
-                        { EndpointResourceName = "ServiceEndpoint", Binding = this.CreateListenBinding() })
+                        new WcfCommunicationListener<IAssistRequestService>(
+                            wcfServiceObject:this,
+                            serviceContext:context,
+                            endpointResourceName:"WcfServiceEndpoint",
+                            listenerBinding:this.CreateListenBinding()
+                        ))
+
             };
-
-
-
         }
 
 
@@ -93,6 +98,33 @@ namespace AssistStatefulService
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
+        }
+
+        public async Task<int> CreateAssistRequest()
+        {
+            var assistRequest = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssist");
+
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                  // await assistRequest.AddOrUpdateAsync(tx, )
+            }
+
+                throw new NotImplementedException();
+        }
+
+        public Task AddMessage(string msg)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<string> GetLastMessage()
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<string>> GetAllMessages()
+        {
+            throw new NotImplementedException();
         }
     }
 }
