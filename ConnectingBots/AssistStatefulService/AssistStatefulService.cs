@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using System.ServiceModel.Channels;
 using System.Web.Services.Description;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
 
 namespace AssistStatefulService
 {
@@ -34,27 +35,43 @@ namespace AssistStatefulService
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             return new[]
-            {
+            {  
+                new ServiceReplicaListener(context =>
+                        new WcfCommunicationListener<IAssistRequestService>(
+                            wcfServiceObject:this,
+                            serviceContext:context,
+                            endpointResourceName:"ServiceEndpoint",
+                            listenerBinding:this.CreateListenBinding()
+                            //listenerBinding: WcfUtility.CreateTcpListenerBinding()
+                        ))
+                     /*   , 
                 new ServiceReplicaListener(context =>
                         new WcfCommunicationListener<IAssistRequestService>(
                             wcfServiceObject:this,
                             serviceContext:context,
                             endpointResourceName:"WcfServiceEndpoint",
-                            listenerBinding:this.CreateListenBinding()
-                        ))
-               /*         ,
-                 new ServiceReplicaListener(context => 
-                        new MyCustomHttpListener(context),
-                                "HTTPReadonlyEndpoint",
-                                true)*/
+                            listenerBinding:this.CreateHttpListenBinding())
+                        ) */
+                        
 
-            };
+             };
         }
 
         private NetHttpBinding CreateHttpListenBinding()
         {
 
-            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None);
+            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None)
+            {
+                SendTimeout = TimeSpan.MaxValue,
+                ReceiveTimeout = TimeSpan.MaxValue,
+                OpenTimeout = TimeSpan.FromSeconds(5),
+                CloseTimeout = TimeSpan.FromSeconds(5),
+                MaxReceivedMessageSize = 1024 * 1024
+            };
+
+            binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
+            binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
+
             return binding;
         }
 
@@ -82,7 +99,7 @@ namespace AssistStatefulService
         /// This method executes when this replica of your service becomes primary and has write status.
         /// </summary>
         /// <param name="cancellationToken">Canceled when Service Fabric needs to shut down this service replica.</param>
-        protected override async Task RunAsync(CancellationToken cancellationToken)
+ /*       protected override async Task RunAsync(CancellationToken cancellationToken)
         {
             // TODO: Replace the following sample code with your own logic 
             //       or remove this RunAsync override if it's not needed in your service.
@@ -110,7 +127,7 @@ namespace AssistStatefulService
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
         }
-
+*/
         public async Task<int> CreateAssistRequest(string firstmessage)
         {
             var assistRequest = new AssistRequestItem();
