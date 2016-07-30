@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="BackendServicesType" ApplicationTypeVersion="1.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
+<ApplicationManifest xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" ApplicationTypeName="BackendServicesType" ApplicationTypeVersion="2.0.0" xmlns="http://schemas.microsoft.com/2011/01/fabric">
   <Parameters>
     <Parameter Name="KBStatelessService_InstanceCount" DefaultValue="-1" />
+    <Parameter Name="AssistStatelessService_InstanceCount" DefaultValue="-1" />
     <Parameter Name="AssistStatefulService_MinReplicaSetSize" DefaultValue="3" />
     <Parameter Name="AssistStatefulService_PartitionCount" DefaultValue="1" />
     <Parameter Name="AssistStatefulService_TargetReplicaSetSize" DefaultValue="3" />
@@ -14,7 +15,11 @@
     <ConfigOverrides />
   </ServiceManifestImport>
   <ServiceManifestImport>
-    <ServiceManifestRef ServiceManifestName="AssistStatefulServicePkg" ServiceManifestVersion="1.0.0" />
+    <ServiceManifestRef ServiceManifestName="AssistStatefulServicePkg" ServiceManifestVersion="2.0.0" />
+    <ConfigOverrides />
+  </ServiceManifestImport>
+  <ServiceManifestImport>
+    <ServiceManifestRef ServiceManifestName="AssistStatelessServicePkg" ServiceManifestVersion="1.0.0" />
     <ConfigOverrides />
   </ServiceManifestImport>
   <DefaultServices>
@@ -25,6 +30,11 @@
          The attribute ServiceTypeName below must match the name defined in the imported ServiceManifest.xml file. -->
     <Service Name="KBStatelessService">
       <StatelessService ServiceTypeName="KBStatelessServiceType" InstanceCount="[KBStatelessService_InstanceCount]">
+        <SingletonPartition />
+      </StatelessService>
+    </Service>
+    <Service Name="AssistStatelessService">
+      <StatelessService ServiceTypeName="AssistStatelessServiceType" InstanceCount="[AssistStatelessService_InstanceCount]">
         <SingletonPartition />
       </StatelessService>
     </Service>

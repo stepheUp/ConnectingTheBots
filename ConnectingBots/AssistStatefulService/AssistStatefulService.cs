@@ -12,6 +12,7 @@ using System.Diagnostics;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using System.ServiceModel.Channels;
 using System.Web.Services.Description;
+using Microsoft.ServiceFabric.Services.Communication.Wcf;
 
 namespace AssistStatefulService
 {
@@ -34,27 +35,43 @@ namespace AssistStatefulService
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             return new[]
-            {
+            {  
+                new ServiceReplicaListener(context =>
+                        new WcfCommunicationListener<IAssistRequestService>(
+                            wcfServiceObject:this,
+                            serviceContext:context,
+                            endpointResourceName:"ServiceEndpoint",
+                            listenerBinding:this.CreateListenBinding()
+                            //listenerBinding: WcfUtility.CreateTcpListenerBinding()
+                        ))
+                     /*   , 
                 new ServiceReplicaListener(context =>
                         new WcfCommunicationListener<IAssistRequestService>(
                             wcfServiceObject:this,
                             serviceContext:context,
                             endpointResourceName:"WcfServiceEndpoint",
-                            listenerBinding:this.CreateListenBinding()
-                        ))
-               /*         ,
-                 new ServiceReplicaListener(context => 
-                        new MyCustomHttpListener(context),
-                                "HTTPReadonlyEndpoint",
-                                true)*/
+                            listenerBinding:this.CreateHttpListenBinding())
+                        ) */
+                        
 
-            };
+             };
         }
 
         private NetHttpBinding CreateHttpListenBinding()
         {
 
-            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None);
+            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None)
+            {
+                SendTimeout = TimeSpan.MaxValue,
+                ReceiveTimeout = TimeSpan.MaxValue,
+                OpenTimeout = TimeSpan.FromSeconds(5),
+                CloseTimeout = TimeSpan.FromSeconds(5),
+                MaxReceivedMessageSize = 1024 * 1024
+            };
+
+            binding.MaxBufferSize = (int)binding.MaxReceivedMessageSize;
+            binding.MaxBufferPoolSize = Environment.ProcessorCount * binding.MaxReceivedMessageSize;
+
             return binding;
         }
 
@@ -87,25 +104,9 @@ namespace AssistStatefulService
             // TODO: Replace the following sample code with your own logic 
             //       or remove this RunAsync override if it's not needed in your service.
 
-            var myDictionary = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, long>>("myDictionary");
-
-            while (true)
+              while (true)
             {
                 cancellationToken.ThrowIfCancellationRequested();
-
-                using (var tx = this.StateManager.CreateTransaction())
-                {
-                    var result = await myDictionary.TryGetValueAsync(tx, "Counter");
-
-                    ServiceEventSource.Current.ServiceMessage(this, "Current Counter Value: {0}",
-                        result.HasValue ? result.Value.ToString() : "Value does not exist.");
-
-                    await myDictionary.AddOrUpdateAsync(tx, "Counter", 0, (key, value) => ++value);
-
-                    // If an exception is thrown before calling CommitAsync, the transaction aborts, all changes are 
-                    // discarded, and nothing is saved to the secondary replicas.
-                    await tx.CommitAsync();
-                }
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }

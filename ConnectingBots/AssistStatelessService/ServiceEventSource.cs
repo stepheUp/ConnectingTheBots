@@ -7,9 +7,9 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.ServiceFabric.Services.Runtime;
 
-namespace AssistStatefulService
+namespace AssistStatelessService
 {
-    [EventSource(Name = "MyCompany-BackendServices-AssistStatefulService")]
+    [EventSource(Name = "MyCompany-BackendServices-AssistStatelessService")]
     internal sealed class ServiceEventSource : EventSource
     {
         public static readonly ServiceEventSource Current = new ServiceEventSource();
@@ -65,19 +65,20 @@ namespace AssistStatefulService
         }
 
         [NonEvent]
-        public void ServiceMessage(StatefulService service, string message, params object[] args)
+        public void ServiceMessage(ServiceContext serviceContext, string message, params object[] args)
         {
             if (this.IsEnabled())
             {
+
                 string finalMessage = string.Format(message, args);
                 ServiceMessage(
-                    service.Context.ServiceName.ToString(),
-                    service.Context.ServiceTypeName,
-                    service.Context.ReplicaId,
-                    service.Context.PartitionId,
-                    service.Context.CodePackageActivationContext.ApplicationName,
-                    service.Context.CodePackageActivationContext.ApplicationTypeName,
-                    service.Context.NodeContext.NodeName,
+                    serviceContext.ServiceName.ToString(),
+                    serviceContext.ServiceTypeName,
+                    GetReplicaOrInstanceId(serviceContext),
+                    serviceContext.PartitionId,
+                    serviceContext.CodePackageActivationContext.ApplicationName,
+                    serviceContext.CodePackageActivationContext.ApplicationTypeName,
+                    serviceContext.NodeContext.NodeName,
                     finalMessage);
             }
         }
