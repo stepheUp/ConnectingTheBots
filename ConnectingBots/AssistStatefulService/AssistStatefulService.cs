@@ -9,14 +9,16 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.ServiceModel;
 using System.Diagnostics;
-
+using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
+using System.ServiceModel.Channels;
+using System.Web.Services.Description;
 
 namespace AssistStatefulService
 {
     /// <summary>
     /// An instance of this class is created for each service replica by the Service Fabric runtime.
     /// </summary>
-    internal sealed class AssistStatefulService : StatefulService
+    internal sealed class AssistStatefulService : StatefulService, IAssistRequestService
     {
         public AssistStatefulService(StatefulServiceContext context)
             : base(context)
@@ -34,12 +36,26 @@ namespace AssistStatefulService
             return new[]
             {
                 new ServiceReplicaListener(context =>
-                        new WcfCommunicationListener(context,typeof(IAssistRequestService,this)
-                        { EndpointResourceName = "ServiceEndpoint", Binding = this.CreateListenBinding() })
+                        new WcfCommunicationListener<IAssistRequestService>(
+                            wcfServiceObject:this,
+                            serviceContext:context,
+                            endpointResourceName:"WcfServiceEndpoint",
+                            listenerBinding:this.CreateListenBinding()
+                        ))
+               /*         ,
+                 new ServiceReplicaListener(context => 
+                        new MyCustomHttpListener(context),
+                                "HTTPReadonlyEndpoint",
+                                true)*/
+
             };
+        }
 
+        private NetHttpBinding CreateHttpListenBinding()
+        {
 
-
+            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None);
+            return binding;
         }
 
 
@@ -93,6 +109,51 @@ namespace AssistStatefulService
 
                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
             }
+        }
+
+        public async Task<int> CreateAssistRequest(string firstmessage)
+        {
+            var assistRequest = new AssistRequestItem();
+            Random rnd = new Random();
+            assistRequest.IdAssistItem =  rnd.Next();
+ 
+            var assistRequestCol = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssistRequests");
+
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+
+                await assistRequestCol.AddOrUpdateAsync(tx, assistRequest.IdAssistItem.ToString(), assistRequest, (k,v) => assistRequest);
+                await tx.CommitAsync();
+            }
+
+                return assistRequest.IdAssistItem;
+        }
+
+        public async Task AddMessage(int AssistId, string msg)
+        {
+            AssistRequestItem item;
+            var assistRequestCol = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssistRequests");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var result =  await assistRequestCol.TryGetValueAsync(tx, AssistId.ToString());
+                if (result.HasValue)
+                {
+                    item = result.Value;
+                    item.Messages.Add(msg);
+                    await tx.CommitAsync();
+                }
+            }
+
+        }
+
+        public Task<string> GetLastMessage(int AssistId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<List<string>> GetAllMessages(int AssistId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
