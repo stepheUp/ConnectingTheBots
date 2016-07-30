@@ -18,7 +18,7 @@ namespace TRGetHelpBot
 
         protected override async Task MessageReceived(IDialogContext context, IAwaitable<IMessageActivity> item)
         {
-         //   CurrentContext = context;
+            CurrentContext = context;
             await base.MessageReceived(context, item);
         }
 
