@@ -12,22 +12,34 @@ namespace KBStatelessService.Services
 {
     public class FaqService
     {
-        private static readonly string DatabaseId   = ConfigurationManager.AppSettings.Get("database");
-        private static readonly string CollectionId = ConfigurationManager.AppSettings.Get("collection");
-        private static readonly string EndPoint     = ConfigurationManager.AppSettings.Get("endpoint");
-        private static readonly string AuthKey      = ConfigurationManager.AppSettings.Get("authkey");
+        private string DatabaseId;
+        private string CollectionId;
+        private string EndPoint;
+        private string AuthKey;
 
-        private static DocumentClient client;
-        private static DocumentCollection collection;
+        private DocumentClient client;
+        private DocumentCollection collection;
 
-        public static void Initialize()
+        private static readonly Lazy<FaqService> _instance =
+            new Lazy<FaqService>(() => new FaqService());
+
+        public static FaqService Instance
         {
-            client = new DocumentClient(new Uri(EndPoint), AuthKey);
-            InitDatabaseAsync().Wait();
-            InitCollectionAsync().Wait();
+            get
+            {
+                return _instance.Value;
+            }
         }
 
-        private static async Task InitDatabaseAsync()
+        private FaqService()
+        {
+            DatabaseId = ConfigurationManager.AppSettings.Get("database");
+            CollectionId = ConfigurationManager.AppSettings.Get("collection");
+            EndPoint = ConfigurationManager.AppSettings.Get("endpoint");
+            AuthKey = ConfigurationManager.AppSettings.Get("authkey");
+        }        
+
+        private async Task initDatabaseAsync()
         {
             try
             {
@@ -39,7 +51,7 @@ namespace KBStatelessService.Services
             }
         }
 
-        private static async Task InitCollectionAsync()
+        private async Task initCollectionAsync()
         {
             try
             {
@@ -51,15 +63,30 @@ namespace KBStatelessService.Services
             }
         }
 
-        public static List<QAItem> RunQuery(string input)
+        public void Initialize()
+        {
+            if (client == null)
+            {
+                client = new DocumentClient(new Uri(EndPoint), AuthKey);
+                initDatabaseAsync().Wait();
+                initCollectionAsync().Wait();
+            }
+        }
+
+        public List<QAItem> RunSearchQuery(string input)
         {
             //SELECT qa from c
             //JOIN qa IN c.list
             //JOIN word IN qa.keywords WHERE word = "input"
 
-            string query = string.Format("SELECT qa.id,qa.question,qa.response from c JOIN qa IN c.list JOIN word IN qa.keywords WHERE word=\"{0}\"", input);
+            List<QAItem> results = null;
 
-            List<QAItem> results = client.CreateDocumentQuery<QAItem>(collection.SelfLink, query).ToList<QAItem>();            
+            if (client != null)
+            {
+                string query = string.Format("SELECT qa.id,qa.question,qa.response from c JOIN qa IN c.list JOIN word IN qa.keywords WHERE word=\"{0}\"", input);
+
+                results = client.CreateDocumentQuery<QAItem>(collection.SelfLink, query).ToList<QAItem>();
+            }
 
             return results;
         }

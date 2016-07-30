@@ -21,7 +21,7 @@ namespace KBStatelessService
 
             appBuilder.UseWebApi(config);
 
-            FaqService.Initialize();
+            FaqService.Instance.Initialize();
         }
     }
 }
