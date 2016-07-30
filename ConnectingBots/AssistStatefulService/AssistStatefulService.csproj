@@ -75,6 +75,8 @@
     <Reference Include="System.Web.Services" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AssistRequestItem.cs" />
+    <Compile Include="IAssistRequestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="AssistStatefulService.cs" />
     <Compile Include="Program.cs" />
@@ -85,12 +87,6 @@
     <None Include="PackageRoot\ServiceManifest.xml" />
     <None Include="App.config" />
     <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Common\Common.csproj">
-      <Project>{5a14700c-fbb2-41b3-86a2-55dba853bf12}</Project>
-      <Name>Common</Name>
-    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

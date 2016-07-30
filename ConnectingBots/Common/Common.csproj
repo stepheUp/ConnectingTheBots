@@ -43,7 +43,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AssistRequestItem.cs" />
-    <Compile Include="Class1.cs" />
     <Compile Include="IAssistRequestService.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

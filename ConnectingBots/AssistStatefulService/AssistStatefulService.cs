@@ -10,7 +10,6 @@ using Microsoft.ServiceFabric.Services.Runtime;
 using System.ServiceModel;
 using System.Diagnostics;
 using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
-using Common;
 using System.ServiceModel.Channels;
 using System.Web.Services.Description;
 
@@ -43,8 +42,20 @@ namespace AssistStatefulService
                             endpointResourceName:"WcfServiceEndpoint",
                             listenerBinding:this.CreateListenBinding()
                         ))
+               /*         ,
+                 new ServiceReplicaListener(context => 
+                        new MyCustomHttpListener(context),
+                                "HTTPReadonlyEndpoint",
+                                true)*/
 
             };
+        }
+
+        private NetHttpBinding CreateHttpListenBinding()
+        {
+
+            NetHttpBinding binding = new NetHttpBinding(BasicHttpSecurityMode.None);
+            return binding;
         }
 
 
@@ -100,29 +111,47 @@ namespace AssistStatefulService
             }
         }
 
-        public async Task<int> CreateAssistRequest()
+        public async Task<int> CreateAssistRequest(string firstmessage)
         {
-            var assistRequest = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssist");
+            var assistRequest = new AssistRequestItem();
+            Random rnd = new Random();
+            assistRequest.IdAssistItem =  rnd.Next();
+ 
+            var assistRequestCol = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssistRequests");
 
             using (var tx = this.StateManager.CreateTransaction())
             {
-                  // await assistRequest.AddOrUpdateAsync(tx, )
+
+                await assistRequestCol.AddOrUpdateAsync(tx, assistRequest.IdAssistItem.ToString(), assistRequest, (k,v) => assistRequest);
+                await tx.CommitAsync();
             }
 
-                throw new NotImplementedException();
+                return assistRequest.IdAssistItem;
         }
 
-        public Task AddMessage(string msg)
+        public async Task AddMessage(int AssistId, string msg)
+        {
+            AssistRequestItem item;
+            var assistRequestCol = await this.StateManager.GetOrAddAsync<IReliableDictionary<string, AssistRequestItem>>("myAssistRequests");
+            using (var tx = this.StateManager.CreateTransaction())
+            {
+                var result =  await assistRequestCol.TryGetValueAsync(tx, AssistId.ToString());
+                if (result.HasValue)
+                {
+                    item = result.Value;
+                    item.Messages.Add(msg);
+                    await tx.CommitAsync();
+                }
+            }
+
+        }
+
+        public Task<string> GetLastMessage(int AssistId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<string> GetLastMessage()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<List<string>> GetAllMessages()
+        public Task<List<string>> GetAllMessages(int AssistId)
         {
             throw new NotImplementedException();
         }
