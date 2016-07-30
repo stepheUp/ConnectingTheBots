@@ -7,7 +7,7 @@ Provides a Skype integration
 ----------
 Technology used:
 - Service Fabric
--  . Knowledge Base service (stateless)
+   . Knowledge Base service (stateless)
    . Assist Service (Worker statefull) + facade (WebAPI stateless)
 - Bot Framework
 - DocumentDB
