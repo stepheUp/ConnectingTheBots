@@ -16,7 +16,6 @@ namespace TRGetHelpBot
             AssemblyName webName = web.GetName();
 
             lblVersion.Text = webName.Version.ToString();
-
         }
     }
 }
