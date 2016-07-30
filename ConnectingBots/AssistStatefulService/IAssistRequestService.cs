@@ -1,27 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.ServiceModel;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.ServiceFabric.Services.Communication.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Runtime;
 
 namespace AssistStatefulService
 {
-    [ServiceContract]
-    public interface IAssistRequestService
+    
+    public interface IAssistRequestService : IService
     {
-        [OperationContract]
-        Task<int> CreateAssistRequest(string firstmessage);
-
-        [OperationContract]
+         Task<int> CreateAssistRequest(string firstmessage);
+        
         Task AddMessage(int AssistId, string msg);
 
-        [OperationContract]
         Task<string> GetLastMessage(int AssistIdd);
-
-        [OperationContract]
+       
         Task<List<string>> GetAllMessages(int AssistId);
-
-
     }
 }

@@ -9,10 +9,10 @@ using Microsoft.ServiceFabric.Services.Communication.Runtime;
 using Microsoft.ServiceFabric.Services.Runtime;
 using System.ServiceModel;
 using System.Diagnostics;
-using Microsoft.ServiceFabric.Services.Communication.Wcf.Runtime;
 using System.ServiceModel.Channels;
 using System.Web.Services.Description;
-using Microsoft.ServiceFabric.Services.Communication.Wcf;
+using Microsoft.ServiceFabric.Services.Remoting.Runtime;
+using Microsoft.ServiceFabric.Services.Remoting.FabricTransport.Runtime;
 
 namespace AssistStatefulService
 {
@@ -35,26 +35,29 @@ namespace AssistStatefulService
         protected override IEnumerable<ServiceReplicaListener> CreateServiceReplicaListeners()
         {
             return new[]
-            {  
-                new ServiceReplicaListener(context =>
-                        new WcfCommunicationListener<IAssistRequestService>(
-                            wcfServiceObject:this,
-                            serviceContext:context,
-                            endpointResourceName:"ServiceEndpoint",
-                            listenerBinding:this.CreateListenBinding()
-                            //listenerBinding: WcfUtility.CreateTcpListenerBinding()
-                        ))
-                     /*   , 
-                new ServiceReplicaListener(context =>
-                        new WcfCommunicationListener<IAssistRequestService>(
-                            wcfServiceObject:this,
-                            serviceContext:context,
-                            endpointResourceName:"WcfServiceEndpoint",
-                            listenerBinding:this.CreateHttpListenBinding())
-                        ) */
-                        
+            {
+                  new ServiceReplicaListener(
+                    (context) => new FabricTransportServiceRemotingListener(context,this))
+            /* 
+            new ServiceReplicaListener(context =>
+                    new WcfCommunicationListener<IAssistRequestService>(
+                        wcfServiceObject:this,
+                        serviceContext:context,
+                        endpointResourceName:"ServiceEndpoint",
+                        listenerBinding:this.CreateListenBinding()
+                        //listenerBinding: WcfUtility.CreateTcpListenerBinding()
+                    ))
+                    , 
+            new ServiceReplicaListener(context =>
+                    new WcfCommunicationListener<IAssistRequestService>(
+                        wcfServiceObject:this,
+                        serviceContext:context,
+                        endpointResourceName:"WcfServiceEndpoint",
+                        listenerBinding:this.CreateHttpListenBinding())
+                    ) */
 
-             };
+
+        };
         }
 
         private NetHttpBinding CreateHttpListenBinding()
