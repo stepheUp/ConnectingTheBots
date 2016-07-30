@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssistStatefulService", "As
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TRGetHelpBot", "TRGetHelpBot\TRGetHelpBot.csproj", "{A8BA1066-5695-4D71-ABB4-65E5A5E0C3D4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KBStatelessService", "KBStatelessService\KBStatelessService.csproj", "{3E874F30-3DB9-4C76-9078-8486F405A517}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,12 @@ Global
 		{A8BA1066-5695-4D71-ABB4-65E5A5E0C3D4}.Release|Any CPU.Build.0 = Release|Any CPU
 		{A8BA1066-5695-4D71-ABB4-65E5A5E0C3D4}.Release|x64.ActiveCfg = Release|Any CPU
 		{A8BA1066-5695-4D71-ABB4-65E5A5E0C3D4}.Release|x64.Build.0 = Release|Any CPU
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Debug|x64.ActiveCfg = Debug|x64
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Debug|x64.Build.0 = Debug|x64
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Release|Any CPU.ActiveCfg = Release|x64
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Release|x64.ActiveCfg = Release|x64
+		{3E874F30-3DB9-4C76-9078-8486F405A517}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
